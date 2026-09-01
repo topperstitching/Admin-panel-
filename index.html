@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Topper Stitching - Admin Panel</title>
+
+    <!-- =====================================================
+         FIREBASE
+    ====================================================== -->
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family:
+                Arial,
+                "Segoe UI",
+                sans-serif;
+        }
+
+
+        body {
+            background: #f1f3f6;
+            color: #222;
+            padding-bottom: 30px;
+        }
+
+
+        /* =====================================================
+           HEADER
+        ====================================================== */
+
+        header {
+            background:
+                linear-gradient(
+                    135deg,
+                    #1a237e,
+                    #0d47a1
+                );
+
+            color: white;
+
+            padding: 16px;
+
+            position: sticky;
+            top: 0;
+
+            z-index: 100;
+
+            box-shadow:
+                0 3px 10px
+                rgba(0,0,0,0.2);
+        }
+
+
+        .header-row {
+            max-width: 1100px;
+
+            margin: auto;
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            gap: 10px;
+        }
+
+
+        .title {
+            font-size: 21px;
+            font-weight: 900;
+        }
+
+
+        .subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+
+        #logoutBtn {
+            border: none;
+
+            background: white;
+
+            color: #1a237e;
+
+            padding:
+                8px 13px;
+
+            border-radius: 20px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+
+        /* =====================================================
+           LOGIN SCREEN
+        ====================================================== */
+
+        #loginScreen {
+            min-height: 85vh;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 20px;
+        }
+
+
+        .login-box {
+            width: 100%;
+            max-width: 420px;
+
+            background: white;
+
+            padding: 30px 20px;
+
+            border-radius: 15px;
+
+            text-align: center;
+
+            box-shadow:
+                0 5px 20px
+                rgba(0,0,0,0.1);
+        }
+
+
+        .login-box h2 {
+            color: #1a237e;
+            margin-bottom: 10px;
+        }
+
+
+        .login-box p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+
+        #loginBtn {
+            width: 100%;
+
+            border: none;
+
+            background: #4285f4;
+
+            color: white;
+
+            padding: 13px;
+
+            border-radius: 7px;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+
+        /* =====================================================
+           ADMIN APP
+        ====================================================== */
+
+        #adminApp {
+            display: none;
+
+            max-width: 1100px;
+
+            margin: auto;
+
+            padding: 16px;
+        }
+
+
+        .welcome-box {
+            background: white;
+
+            border-radius: 10px;
+
+            padding: 15px;
+
+            margin-bottom: 15px;
+
+            border: 1px solid #ddd;
+        }
+
+
+        .welcome-box strong {
+            color: #1a237e;
+        }
+
+
+        /* =====================================================
+           STATS
+        ====================================================== */
+
+        .stats {
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(130px, 1fr)
+                );
+
+            gap: 10px;
+
+            margin-bottom: 18px;
+        }
+
+
+        .stat {
+            background: white;
+
+            border: 1px solid #ddd;
+
+            border-radius: 10px;
+
+            padding: 15px;
+
+            text-align: center;
+        }
+
+
+        .stat-number {
+            font-size: 25px;
+
+            font-weight: 900;
+
+            color: #1a237e;
+        }
+
+
+        .stat-label {
+            font-size: 12px;
+
+            color: #666;
+
+            margin-top: 4px;
+        }
+
+
+        /* =====================================================
+           FILTER
+        ====================================================== */
+
+        .toolbar {
+            background: white;
+
+            border: 1px solid #ddd;
+
+            border-radius: 10px;
+
+            padding: 12px;
+
+            margin-bottom: 15px;
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 8px;
+        }
+
+
+        .filter-btn {
+            border: 1px solid #bbb;
+
+            background: white;
+
+            padding: 8px 12px;
+
+            border-radius: 20px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+            font-size: 12px;
+        }
+
+
+        .filter-btn.active {
+            background: #0d47a1;
+            color: white;
+            border-color: #0d47a1;
+        }
+
+
+        #refreshBtn {
+            margin-left: auto;
+
+            border: none;
+
+            background: #2e7d32;
+
+            color: white;
+
+            padding: 8px 14px;
+
+            border-radius: 20px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+        }
+
+
+        /* =====================================================
+           ORDERS
+        ====================================================== */
+
+        #ordersContainer {
+            display: grid;
+
+            gap: 14px;
+        }
+
+
+        .order-card {
+            background: white;
+
+            border-radius: 12px;
+
+            border: 1px solid #ddd;
+
+            padding: 15px;
+
+            box-shadow:
+                0 3px 10px
+                rgba(0,0,0,0.05);
+        }
+
+
+        .order-top {
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items:
+                flex-start;
+
+            gap: 10px;
+
+            border-bottom:
+                1px solid #eee;
+
+            padding-bottom: 10px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .product-name {
+            color: #1a237e;
+
+            font-size: 17px;
+
+            font-weight: 900;
+        }
+
+
+        .order-id {
+            color: #888;
+
+            font-size: 10px;
+
+            margin-top: 4px;
+
+            word-break: break-all;
+        }
+
+
+        .status {
+            padding: 5px 10px;
+
+            border-radius: 20px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+        }
+
+
+        .pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+
+        .failed {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+
+        .details {
+            display: grid;
+
+            gap: 6px;
+
+            font-size: 13px;
+
+            color: #444;
+        }
+
+
+        .details b {
+            color: #222;
+        }
+
+
+        .address {
+            background: #f7f7f7;
+
+            padding: 9px;
+
+            border-radius: 7px;
+
+            margin-top: 5px;
+        }
+
+
+        /* =====================================================
+           ACTION BUTTONS
+        ====================================================== */
+
+        .actions {
+            display: flex;
+
+            gap: 8px;
+
+            margin-top: 14px;
+        }
+
+
+        .action-btn {
+            flex: 1;
+
+            border: none;
+
+            padding: 11px;
+
+            border-radius: 7px;
+
+            color: white;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+
+        .success-btn {
+            background: #2e7d32;
+        }
+
+
+        .failed-btn {
+            background: #c62828;
+        }
+
+
+        .action-btn:disabled {
+            opacity: 0.6;
+
+            cursor: not-allowed;
+        }
+
+
+        /* =====================================================
+           LOADING / EMPTY
+        ====================================================== */
+
+        .message-box {
+            background: white;
+
+            border: 1px solid #ddd;
+
+            border-radius: 10px;
+
+            padding: 30px 15px;
+
+            text-align: center;
+
+            color: #777;
+        }
+
+
+        .error-box {
+            color: #c62828;
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ====================================================== */
+
+        @media (max-width: 600px) {
+
+            .title {
+                font-size: 18px;
+            }
+
+            .header-row {
+                align-items: flex-start;
+            }
+
+            .order-top {
+                flex-direction: column;
+            }
+
+            .status {
+                align-self: flex-start;
+            }
+
+            #refreshBtn {
+                margin-left: 0;
+            }
+
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header>
+
+    <div class="header-row">
+
+        <div>
+
+            <div class="title">
+                TOPPER STITCHING
+            </div>
+
+            <div class="subtitle">
+                Admin Order Panel
+            </div>
+
+        </div>
+
+
+        <button
+            id="logoutBtn"
+            onclick="logout()"
+            style="display:none;"
+        >
+            Logout
+        </button>
+
+    </div>
+
+</header>
+
+
+
+<!-- =========================================================
+     LOGIN SCREEN
+========================================================= -->
+
+<div id="loginScreen">
+
+    <div class="login-box">
+
+        <h2>
+            🔐 Admin Panel
+        </h2>
+
+        <p>
+            केवल Admin Google Account से
+            Login करके Orders देख सकते हैं।
+        </p>
+
+
+        <button
+            id="loginBtn"
+            onclick="adminLogin()"
+        >
+            🔵 Google से Admin Login
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     ADMIN APP
+========================================================= -->
+
+<div id="adminApp">
+
+
+    <div class="welcome-box">
+
+        <div>
+            Welcome, <strong id="adminName">
+                Admin
+            </strong>
+        </div>
+
+        <div
+            id="adminEmail"
+            style="
+                color:#777;
+                font-size:12px;
+                margin-top:4px;
+            "
+        ></div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         STATS
+    ====================================================== -->
+
+    <div class="stats">
+
+        <div class="stat">
+
+            <div
+                class="stat-number"
+                id="totalCount"
+            >
+                0
+            </div>
+
+            <div class="stat-label">
+                Total Orders
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div
+                class="stat-number"
+                id="pendingCount"
+            >
+                0
+            </div>
+
+            <div class="stat-label">
+                Pending
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div
+                class="stat-number"
+                id="successCount"
+            >
+                0
+            </div>
+
+            <div class="stat-label">
+                Successful
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div
+                class="stat-number"
+                id="failedCount"
+            >
+                0
+            </div>
+
+            <div class="stat-label">
+                Failed
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         FILTER
+    ====================================================== -->
+
+    <div class="toolbar">
+
+        <button
+            class="filter-btn active"
+            data-filter="all"
+            onclick="setFilter('all', this)"
+        >
+            सभी
+        </button>
+
+
+        <button
+            class="filter-btn"
+            data-filter="Pending"
+            onclick="setFilter('Pending', this)"
+        >
+            Pending
+        </button>
+
+
+        <button
+            class="filter-btn"
+            data-filter="Payment Successful"
+            onclick="setFilter('Payment Successful', this)"
+        >
+            Successful
+        </button>
+
+
+        <button
+            class="filter-btn"
+            data-filter="Failed"
+            onclick="setFilter('Failed', this)"
+        >
+            Failed
+        </button>
+
+
+        <button
+            id="refreshBtn"
+            onclick="loadOrders()"
+        >
+            🔄 Refresh
+        </button>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         ORDERS
+    ====================================================== -->
+
+    <div id="ordersContainer">
+
+        <div class="message-box">
+            Orders लोड हो रहे हैं...
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   FIREBASE CONFIG
+========================================================= */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyDrsMo4f15JZxUk8LkNYqlYqfzEHOQ8Q4w",
+
+    authDomain:
+        "toppersewingmachine.firebaseapp.com",
+
+    databaseURL:
+        "https://toppersewingmachine-default-rtdb.firebaseio.com",
+
+    projectId:
+        "toppersewingmachine",
+
+    storageBucket:
+        "toppersewingmachine.firebasestorage.app",
+
+    messagingSenderId:
+        "281176461879",
+
+    appId:
+        "1:281176461879:web:97648170de01d8c975e5b2",
+
+    measurementId:
+        "G-GRP6EXGE3L"
+
+};
+
+
+/* =========================================================
+   ADMIN EMAIL
+   यही Gmail Admin होगा
+========================================================= */
+
+const ADMIN_EMAIL =
+    "ankitsingh926413@gmail.com";
+
+
+/* =========================================================
+   INITIALIZE FIREBASE
+========================================================= */
+
+if (!firebase.apps.length) {
+
+    firebase.initializeApp(
+        firebaseConfig
+    );
+
+}
+
+
+const auth =
+    firebase.auth();
+
+
+const db =
+    firebase.database();
+
+
+
+/* =========================================================
+   GLOBAL VARIABLES
+========================================================= */
+
+let allOrders = [];
+
+let currentFilter = "all";
+
+
+
+/* =========================================================
+   AUTH STATE
+========================================================= */
+
+auth.onAuthStateChanged(
+    function(user) {
+
+        if (!user) {
+
+            showLogin();
+
+            return;
+
+        }
+
+
+        const email =
+            (
+                user.email ||
+                ""
+            ).toLowerCase();
+
+
+        const adminEmail =
+            ADMIN_EMAIL.toLowerCase();
+
+
+        /* =================================================
+           ADMIN CHECK
+        ================================================= */
+
+        if (email !== adminEmail) {
+
+            alert(
+                "❌ यह Google Account Admin नहीं है।"
+            );
+
+
+            auth.signOut();
+
+            return;
+
+        }
+
+
+        /* =================================================
+           ADMIN LOGIN SUCCESS
+        ================================================= */
+
+        document.getElementById(
+            "loginScreen"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "adminApp"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "logoutBtn"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "adminName"
+        ).innerText =
+            user.displayName ||
+            "Admin";
+
+
+        document.getElementById(
+            "adminEmail"
+        ).innerText =
+            user.email || "";
+
+
+        loadOrders();
+
+    }
+);
+
+
+
+/* =========================================================
+   SHOW LOGIN
+========================================================= */
+
+function showLogin() {
+
+    document.getElementById(
+        "loginScreen"
+    ).style.display =
+        "flex";
+
+
+    document.getElementById(
+        "adminApp"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "logoutBtn"
+    ).style.display =
+        "none";
+
+}
+
+
+
+/* =========================================================
+   ADMIN LOGIN
+========================================================= */
+
+function adminLogin() {
+
+    const provider =
+        new firebase.auth.GoogleAuthProvider();
+
+
+    provider.setCustomParameters({
+
+        prompt:
+            "select_account"
+
+    });
+
+
+    auth.signInWithPopup(
+        provider
+    )
+
+    .catch(
+        function(error) {
+
+            console.error(
+                "Admin Login Error:",
+                error
+            );
+
+
+            if (
+                error.code ===
+                "auth/popup-blocked"
+            ) {
+
+                alert(
+                    "Google popup block हो गया है। Browser में popup अनुमति दें।"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                error.code ===
+                "auth/popup-closed-by-user"
+            ) {
+
+                return;
+
+            }
+
+
+            alert(
+                "Login Error:\n\n" +
+                error.code +
+                "\n\n" +
+                error.message
+            );
+
+        }
+    );
+
+}
+
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+function logout() {
+
+    auth.signOut()
+
+    .then(
+        function() {
+
+            showLogin();
+
+        }
+    )
+
+    .catch(
+        function(error) {
+
+            alert(
+                "Logout Error: " +
+                error.message
+            );
+
+        }
+    );
+
+}
+
+
+
+/* =========================================================
+   LOAD ALL ORDERS
+========================================================= */
+
+function loadOrders() {
+
+    const container =
+        document.getElementById(
+            "ordersContainer"
+        );
+
+
+    container.innerHTML =
+        '<div class="message-box">' +
+        '⏳ Orders लोड हो रहे हैं...' +
+        '</div>';
+
+
+    db.ref("orders")
+
+    .once("value")
+
+    .then(
+        function(snapshot) {
+
+            allOrders = [];
+
+
+            if (!snapshot.exists()) {
+
+                updateStats();
+
+                renderOrders();
+
+                return;
+
+            }
+
+
+            /* =============================================
+               प्रत्येक USER
+            ============================================== */
+
+            snapshot.forEach(
+                function(userSnapshot) {
+
+                    const userId =
+                        userSnapshot.key;
+
+
+                    /* =====================================
+                       प्रत्येक ORDER
+                    ====================================== */
+
+                    userSnapshot.forEach(
+                        function(orderSnapshot) {
+
+                            const order =
+                                orderSnapshot.val() ||
+                                {};
+
+
+                            allOrders.push({
+
+                                userId:
+                                    userId,
+
+                                orderId:
+                                    orderSnapshot.key,
+
+                                ...order
+
+                            });
+
+                        }
+                    );
+
+                }
+            );
+
+
+            /* =============================================
+               नए orders पहले
+            ============================================== */
+
+            allOrders.sort(
+                function(a, b) {
+
+                    return (
+                        (b.createdAt || 0) -
+                        (a.createdAt || 0)
+                    );
+
+                }
+            );
+
+
+            updateStats();
+
+            renderOrders();
+
+        }
+    )
+
+    .catch(
+        function(error) {
+
+            console.error(
+                "Orders Error:",
+                error
+            );
+
+
+            container.innerHTML =
+
+                '<div class="message-box error-box">' +
+
+                '❌ Orders लोड नहीं हो सके।<br><br>' +
+
+                'Firebase Database Rules में Admin permission check करें।<br><br>' +
+
+                error.message +
+
+                '</div>';
+
+        }
+    );
+
+}
+
+
+
+/* =========================================================
+   UPDATE STATS
+========================================================= */
+
+function updateStats() {
+
+    let pending = 0;
+
+    let success = 0;
+
+    let failed = 0;
+
+
+    allOrders.forEach(
+        function(order) {
+
+            const status =
+                order.status ||
+                "Pending";
+
+
+            if (
+                status ===
+                "Pending"
+            ) {
+
+                pending++;
+
+            }
+
+            else if (
+                status ===
+                "Payment Successful"
+            ) {
+
+                success++;
+
+            }
+
+            else if (
+                status ===
+                "Failed"
+            ) {
+
+                failed++;
+
+            }
+
+        }
+    );
+
+
+    document.getElementById(
+        "totalCount"
+    ).innerText =
+        allOrders.length;
+
+
+    document.getElementById(
+        "pendingCount"
+    ).innerText =
+        pending;
+
+
+    document.getElementById(
+        "successCount"
+    ).innerText =
+        success;
+
+
+    document.getElementById(
+        "failedCount"
+    ).innerText =
+        failed;
+
+}
+
+
+
+/* =========================================================
+   FILTER
+========================================================= */
+
+function setFilter(
+    filter,
+    button
+) {
+
+    currentFilter =
+        filter;
+
+
+    document
+        .querySelectorAll(
+            ".filter-btn"
+        )
+        .forEach(
+            function(btn) {
+
+                btn.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    button.classList.add(
+        "active"
+    );
+
+
+    renderOrders();
+
+}
+
+
+
+/* =========================================================
+   RENDER ORDERS
+========================================================= */
+
+function renderOrders() {
+
+    const container =
+        document.getElementById(
+            "ordersContainer"
+        );
+
+
+    let filtered =
+        allOrders;
+
+
+    if (
+        currentFilter !==
+        "all"
+    ) {
+
+        filtered =
+            allOrders.filter(
+                function(order) {
+
+                    return (
+                        (
+                            order.status ||
+                            "Pending"
+                        ) ===
+                        currentFilter
+                    );
+
+                }
+            );
+
+    }
+
+
+    if (
+        filtered.length ===
+        0
+    ) {
+
+        container.innerHTML =
+
+            '<div class="message-box">' +
+
+            '📦 इस category में कोई order नहीं है।' +
+
+            '</div>';
+
+        return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    filtered.forEach(
+        function(order) {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "order-card";
+
+
+            const status =
+                order.status ||
+                "Pending";
+
+
+            let statusClass =
+                "pending";
+
+
+            if (
+                status ===
+                "Payment Successful"
+            ) {
+
+                statusClass =
+                    "success";
+
+            }
+
+
+            if (
+                status ===
+                "Failed"
+            ) {
+
+                statusClass =
+                    "failed";
+
+            }
+
+
+            /* =========================================
+               ORDER TOP
+            ========================================== */
+
+            const top =
+                document.createElement(
+                    "div"
+                );
+
+
+            top.className =
+                "order-top";
+
+
+            const left =
+                document.createElement(
+                    "div"
+                );
+
+
+            const product =
+                document.createElement(
+                    "div"
+                );
+
+
+            product.className =
+                "product-name";
+
+
+            product.innerText =
+                order.product ||
+                "Product";
+
+
+            const orderId =
+                document.createElement(
+                    "div"
+                );
+
+
+            orderId.className =
+                "order-id";
+
+
+            orderId.innerText =
+                "Order ID: " +
+                order.orderId;
+
+
+            left.appendChild(
+                product
+            );
+
+
+            left.appendChild(
+                orderId
+            );
+
+
+            const statusBadge =
+                document.createElement(
+                    "span"
+                );
+
+
+            statusBadge.className =
+                "status " +
+                statusClass;
+
+
+            statusBadge.innerText =
+                status;
+
+
+            top.appendChild(
+                left
+            );
+
+
+            top.appendChild(
+                statusBadge
+            );
+
+
+            card.appendChild(
+                top
+            );
+
+
+
+            /* =========================================
+               DETAILS
+            ========================================== */
+
+            const details =
+                document.createElement(
+                    "div"
+                );
+
+
+            details.className =
+                "details";
+
+
+            details.innerHTML =
+
+                "<div><b>💰 कीमत:</b> ₹" +
+                escapeHtml(
+                    order.price || ""
+                ) +
+                "</div>" +
+
+                "<div><b>👤 ग्राहक:</b> " +
+                escapeHtml(
+                    order.customerName || ""
+                ) +
+                "</div>" +
+
+                "<div><b>📞 फोन:</b> " +
+                escapeHtml(
+                    order.customerPhone || ""
+                ) +
+                "</div>" +
+
+                "<div><b>📧 Email:</b> " +
+                escapeHtml(
+                    order.userEmail || ""
+                ) +
+                "</div>" +
+
+                "<div><b>🕒 तारीख:</b> " +
+                escapeHtml(
+                    order.timestamp || ""
+                ) +
+                "</div>";
+
+
+            if (
+                order.address
+            ) {
+
+                const address =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                address.className =
+                    "address";
+
+
+                address.innerHTML =
+                    "<b>🏠 पता:</b><br>" +
+                    escapeHtml(
+                        order.address
+                    );
+
+
+                details.appendChild(
+                    address
+                );
+
+            }
+
+
+            if (
+                order.location &&
+                order.location !==
+                "उपलब्ध नहीं (GPS अनुमति दें)"
+            ) {
+
+                const location =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                location.innerHTML =
+                    '<b>📍 Location:</b> ' +
+                    '<a href="' +
+                    escapeAttribute(
+                        order.location
+                    ) +
+                    '" target="_blank">' +
+                    'Google Maps खोलें' +
+                    '</a>';
+
+
+                details.appendChild(
+                    location
+                );
+
+            }
+
+
+            card.appendChild(
+                details
+            );
+
+
+
+            /* =========================================
+               ACTION BUTTONS
+            ========================================== */
+
+            const actions =
+                document.createElement(
+                    "div"
+                );
+
+
+            actions.className =
+                "actions";
+
+
+            const successBtn =
+                document.createElement(
+                    "button"
+                );
+
+
+            successBtn.className =
+                "action-btn success-btn";
+
+
+            successBtn.innerText =
+                "✅ Successful";
+
+
+            successBtn.onclick =
+                function() {
+
+                    updateOrderStatus(
+                        order,
+                        "Payment Successful"
+                    );
+
+                };
+
+
+            const failedBtn =
+                document.createElement(
+                    "button"
+                );
+
+
+            failedBtn.className =
+                "action-btn failed-btn";
+
+
+            failedBtn.innerText =
+                "❌ Failed";
+
+
+            failedBtn.onclick =
+                function() {
+
+                    updateOrderStatus(
+                        order,
+                        "Failed"
+                    );
+
+                };
+
+
+            actions.appendChild(
+                successBtn
+            );
+
+
+            actions.appendChild(
+                failedBtn
+            );
+
+
+            card.appendChild(
+                actions
+            );
+
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+
+/* =========================================================
+   UPDATE ORDER STATUS
+========================================================= */
+
+function updateOrderStatus(
+    order,
+    newStatus
+) {
+
+    if (!order.userId) {
+
+        alert(
+            "User ID नहीं मिला।"
+        );
+
+        return;
+
+    }
+
+
+    if (!order.orderId) {
+
+        alert(
+            "Order ID नहीं मिला।"
+        );
+
+        return;
+
+    }
+
+
+    const confirmText =
+        newStatus ===
+        "Payment Successful"
+
+            ? "क्या इस order को Successful करना है?"
+
+            : "क्या इस order को Failed करना है?";
+
+
+    if (
+        !confirm(
+            confirmText
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const updateData = {
+
+        status:
+            newStatus,
+
+        statusUpdatedAt:
+            Date.now(),
+
+        statusUpdatedBy:
+            ADMIN_EMAIL
+
+    };
+
+
+    db.ref(
+        "orders/" +
+        order.userId +
+        "/" +
+        order.orderId
+    )
+
+    .update(
+        updateData
+    )
+
+    .then(
+        function() {
+
+            /* =========================================
+               Local data update
+            ========================================== */
+
+            const found =
+                allOrders.find(
+                    function(item) {
+
+                        return (
+                            item.userId ===
+                            order.userId &&
+                            item.orderId ===
+                            order.orderId
+                        );
+
+                    }
+                );
+
+
+            if (found) {
+
+                found.status =
+                    newStatus;
+
+                found.statusUpdatedAt =
+                    updateData.statusUpdatedAt;
+
+                found.statusUpdatedBy =
+                    updateData.statusUpdatedBy;
+
+            }
+
+
+            updateStats();
+
+            renderOrders();
+
+
+            alert(
+                "✅ Order status update हो गया:\n\n" +
+                newStatus
+            );
+
+        }
+    )
+
+    .catch(
+        function(error) {
+
+            console.error(
+                "Status Update Error:",
+                error
+            );
+
+
+            alert(
+
+                "❌ Status update नहीं हुआ।\n\n" +
+
+                "Firebase Rules check करें।\n\n" +
+
+                error.message
+
+            );
+
+        }
+    );
+
+}
+
+
+
+/* =========================================================
+   HTML ESCAPE
+========================================================= */
+
+function escapeHtml(
+    value
+) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+
+/* =========================================================
+   ATTRIBUTE ESCAPE
+========================================================= */
+
+function escapeAttribute(
+    value
+) {
+
+    return String(value)
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        );
+
+}
+
+</script>
+
+
+</body>
+</html>
